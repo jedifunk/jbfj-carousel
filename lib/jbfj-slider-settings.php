@@ -1,5 +1,4 @@
 <?php
-
 function jbfj_slider_settings_page() {
 	
 	// check for sufficient admin permissions
@@ -12,7 +11,7 @@ function jbfj_slider_settings_page() {
 ?>
 
 <div class="wrap">
-	<?php screen_icon('options-general'); ?><h2>JBFJ Slider Settings</h2>
+	<?php screen_icon('options-general'); ?><h2>jbfj Slider Settings</h2>
 	<?php settings_errors(); ?>
 	
 	<form method="post" action="options.php">
@@ -23,6 +22,8 @@ function jbfj_slider_settings_page() {
 			submit_button(); 
 		?>
 	</form>
+	
+	<p><?php printf( __ ( 'Use %1$s to add this slideshow to your theme.', 'slide'), "<code><&#63;php if ( function_exists( 'jbfj_slider' ) ) { jbfj_slider(); } &#63;></code>")?></p>
 </div>
 
 <?php }
@@ -45,6 +46,7 @@ function jbfj_slider_default_options() {
 	return apply_filters( 'jbfj_slider_default_options', $defaults );
 	
 }
+add_action('admin_init', 'jbfj_slider_admin_init');
 
 function jbfj_slider_admin_init() {
 

@@ -1,10 +1,10 @@
 <?php
 /*
 	Plugin Name: JBFJ Slider
-	Description: Custom Slider with Full Responsive.
+	Description: Custom Slider
 	Author: Bryce Flory
 	Author URI: http://bryceflory.com
-	Version: 1.0
+	Version: 1.2
 */
 
 // Define Constants
@@ -39,7 +39,7 @@ function register_cpt_slide() {
         'show_ui' => true,
         'show_in_menu' => true,
         'menu_position' => 20,
-        'menu_icon' => plugins_url('jbfjslider/lib/img/images-stack.png'),
+        'menu_icon' => plugins_url('jbfj-slider/lib/img/images-stack.png'),
         'show_in_nav_menus' => false,
         'publicly_queryable' => false,
         'exclude_from_search' => true,
@@ -99,44 +99,22 @@ function jbfj_slider_scripts() {
 	}
 }
 
-// Add Thumbnail Support
-add_theme_support('post-thumbnails');
-
-/******************* ADMIN SECTION ************************/
+/******************* SETTINGS SECTION ************************/
 // Add admin menu
 function jbfj_slider_settings_menu() {
-	require JBFJ_PATH . 'jbfj-slider-admin.php';
+	require JBFJ_PATH . 'lib/jbfj-slider-settings.php';
 	//add submenu
 	add_submenu_page('edit.php?post_type=slide', 'Slider Settings', 'Slider Settings', 'manage_options', 'slider-settings', 'jbfj_slider_settings_page');
 }
 add_action('admin_menu', 'jbfj_slider_settings_menu');
-add_action('admin_init', 'jbfj_slider_admin_init');
+
+/******************* SLIDE ADMIN SECTION ****************/
+if ( is_admin() ) {
+	require_once( 'lib/jbfj-slider-admin.php' );	
+}
 
 /******************* FRONT END OUTPUT *******************/
 //Display functionality
 function jbfj_slider() {
-	$posts = get_posts(array(
-		'numberposts' => -1,
-		'post_type' => 'slide',
-		'order' => 'ASC'
-	));
-	 
-	if($posts) {
-		echo '<ul class="carousel">';
-			
-				$first = true;
-				foreach($posts as $post) {
-					$url = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'full');
-					$content = get_the_content();
-					if ($first) {
-						echo '<li><img src="'. $url[0] .'" /></li>';
-						$first = false;
-					} else {
-						echo '<li><img src="'. $url[0] .'" /></li>';
-					}
-				};
-
-		echo '</ul>';
-	}
+	require JBFJ_PATH . 'lib/jbfj-slider-output.php';
 }
-
