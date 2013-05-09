@@ -3,8 +3,8 @@
 	Plugin Name: JBFJ Slider
 	Description: Custom Slider
 	Author: Bryce Flory
-	Author URI: http://bryceflory.com
-	Version: 1.2
+	Author URI: http://jedifunk.github.io/jbfj-slider/
+	Version: 1.3
 */
 
 // Define Constants

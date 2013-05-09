@@ -7,6 +7,7 @@ This plugin uses the great bxslider.js jQuery plugin by Steven Wanderski.
 View the plugin on GitHub at https://github.com/wandoledzep/bxslider-4
 
 Version: 1.3
+http://jedifunk.github.io/jbfj-slider/
 
 =============
 
