@@ -1,7 +1,7 @@
 /**
- * GPS Slider CSS
+ * JBFJ Slider CSS
+ * Based on the BX Slider CSS
  */
-
 
 /** RESET AND LAYOUT
 ===================================*/
@@ -22,19 +22,15 @@
 ===================================*/
 
 .bx-wrapper .bx-viewport {
-	-moz-box-shadow: 0 0 5px #ccc;
-	-webkit-box-shadow: 0 0 5px #ccc;
-	box-shadow: 0 0 5px #ccc;
-	border: solid #fff 5px;
-	left: -5px;
-	background: #fff;
+	
 }
 
 .bx-wrapper .bx-pager,
 .bx-wrapper .bx-controls-auto {
 	position: absolute;
-	bottom: -30px;
-	width: 100%;
+	top: 0;
+	right: 10px;
+	z-index: 60;
 }
 
 /* LOADER */
@@ -58,7 +54,7 @@
 	font-family: Arial;
 	font-weight: bold;
 	color: #666;
-	padding-top: 20px;
+	padding-top: 10px;
 }
 
 .bx-wrapper .bx-pager .bx-pager-item,
@@ -74,7 +70,7 @@
 	display: block;
 	width: 10px;
 	height: 10px;
-	margin: 0 5px;
+	margin: 0 2px;
 	outline: 0;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
@@ -121,54 +117,6 @@
 	display: none;
 }
 
-/* AUTO CONTROLS (START / STOP) */
-
-.bx-wrapper .bx-controls-auto {
-	text-align: center;
-}
-
-.bx-wrapper .bx-controls-auto .bx-start {
-	display: block;
-	text-indent: -9999px;
-	width: 10px;
-	height: 11px;
-	outline: 0;
-	background: url(../img/controls.png) -86px -11px no-repeat;
-	margin: 0 3px;
-}
-
-.bx-wrapper .bx-controls-auto .bx-start:hover,
-.bx-wrapper .bx-controls-auto .bx-start.active {
-	background-position: -86px 0;
-}
-
-.bx-wrapper .bx-controls-auto .bx-stop {
-	display: block;
-	text-indent: -9999px;
-	width: 9px;
-	height: 11px;
-	outline: 0;
-	background: url(../img/controls.png) -86px -44px no-repeat;
-	margin: 0 3px;
-}
-
-.bx-wrapper .bx-controls-auto .bx-stop:hover,
-.bx-wrapper .bx-controls-auto .bx-stop.active {
-	background-position: -86px -33px;
-}
-
-/* PAGER WITH AUTO-CONTROLS HYBRID LAYOUT */
-
-.bx-wrapper .bx-controls.bx-has-controls-auto.bx-has-pager .bx-pager {
-	text-align: left;
-	width: 80%;
-}
-
-.bx-wrapper .bx-controls.bx-has-controls-auto.bx-has-pager .bx-controls-auto {
-	right: 0;
-	width: 35px;
-}
-
 /* IMAGE CAPTIONS */
 .slider-caption {
 	position: absolute;
@@ -177,4 +125,5 @@
 	padding: 15px;
 	background-color: rgba(0,0,0,.75);
 	color: white;
+	max-width: 50%;
 }

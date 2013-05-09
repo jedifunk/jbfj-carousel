@@ -6,19 +6,24 @@ Wordpress content slider plugin.  Full responsive.
 This plugin uses the great bxslider.js jQuery plugin by Steven Wanderski.
 View the plugin on GitHub at https://github.com/wandoledzep/bxslider-4
 
-Version: 1.2
+Version: 1.3
 
 =============
 
 Feature additions coming soon:
 - Add Video embeds
 - Add HTML content
-- Multiple Sliders (per site and/or per page)
 - Custom pager location
+- Replace control images with custom icon font options
 
 =============
 
 Change Log:
+
+1.3: May 8, 2013
+
+ - Added multiple slideshow capabilities
+ - Moved pager location to top right corner
 
 1.2: May 7, 2013
 

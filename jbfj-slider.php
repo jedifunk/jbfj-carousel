@@ -53,15 +53,52 @@ function register_cpt_slide() {
     register_post_type( 'slide', $args );
 }
 
+// Create Custom Taxonomy for Slideshows
+add_action( 'init', 'register_taxonomy_slideshows' );
+
+function register_taxonomy_slideshows() {
+
+    $labels = array( 
+        'name' => _x( 'Slideshows', 'slideshows' ),
+        'singular_name' => _x( 'Slideshow', 'slideshows' ),
+        'search_items' => _x( 'Search Slideshows', 'slideshows' ),
+        'popular_items' => _x( 'Popular Slideshows', 'slideshows' ),
+        'all_items' => _x( 'All Slideshows', 'slideshows' ),
+        'parent_item' => _x( 'Parent Slideshow', 'slideshows' ),
+        'parent_item_colon' => _x( 'Parent Slideshow:', 'slideshows' ),
+        'edit_item' => _x( 'Edit Slideshow', 'slideshows' ),
+        'update_item' => _x( 'Update Slideshow', 'slideshows' ),
+        'add_new_item' => _x( 'Add New Slideshow', 'slideshows' ),
+        'new_item_name' => _x( 'New Slideshow', 'slideshows' ),
+        'separate_items_with_commas' => _x( 'Separate slideshows with commas', 'slideshows' ),
+        'add_or_remove_items' => _x( 'Add or remove slideshows', 'slideshows' ),
+        'choose_from_most_used' => _x( 'Choose from the most used slideshows', 'slideshows' ),
+        'menu_name' => _x( 'Slideshows', 'slideshows' ),
+    );
+
+    $args = array( 
+        'labels' => $labels,
+        'public' => true,
+        'show_in_nav_menus' => false,
+        'show_ui' => true,
+        'show_tagcloud' => false,
+        'show_admin_column' => true,
+        'hierarchical' => true,
+        'rewrite' => array( 'slug' => 'slideshow' )
+    );
+
+    register_taxonomy( 'slideshow', 'slide', $args );
+}
+
 //Add CSS for Slider
 add_action('wp_print_styles', 'jbfj_slider_styles');
 
 function jbfj_slider_styles() {
 	//register
-	wp_register_style('bxslider_styles', plugins_url('lib/css/jquery.bxslider.css', __FILE__));
+	wp_register_style('jbfjslider_styles', plugins_url('lib/css/jbfj-slider.css', __FILE__));
 	
 	//enqueue
-	wp_enqueue_style('bxslider_styles');
+	wp_enqueue_style('jbfjslider_styles');
 }
 
 //Add Javascript for Slider
@@ -115,6 +152,6 @@ if ( is_admin() ) {
 
 /******************* FRONT END OUTPUT *******************/
 //Display functionality
-function jbfj_slider() {
-	require JBFJ_PATH . 'lib/jbfj-slider-output.php';
+function jbfj_slider( $slideshow='') {
+	include('lib/jbfj-slider-output.php');
 }
