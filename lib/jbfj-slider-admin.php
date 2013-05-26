@@ -35,6 +35,7 @@ function slide_url_callback() {
 
 function add_slide_url() {
 	global $post;
-	$data = $_POST['slide_url_id'];
-	update_post_meta($post->ID, 'slide_url', $data);
+	if(isset ($_POST['slide_url_id']) && $_POST['slide_url_id'] !='') {
+		update_post_meta($post->ID, 'slide_url', $_POST['slide_url_id']);
+	}
 }
