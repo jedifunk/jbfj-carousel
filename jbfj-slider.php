@@ -1,14 +1,14 @@
 <?php
 /*
 	Plugin Name: JBFJ Slider
-	Description: Custom Slider
+	Description: Responsive Slider using the BX Slider
 	Author: Bryce Flory
-	Author URI: http://jedifunk.github.io/jbfj-slider/
-	Version: 1.3
+	Author URI: http://bryceflory.com
+	Version: 1.5.2
 */
 
 // Define Constants
-define( 'JBFJ_PATH', plugin_dir_path(__FILE__) );
+define( 'jbfj_PATH', plugin_dir_path(__FILE__) );
 
 // Create CPT for Slides
 add_action( 'init', 'register_cpt_slide' );
@@ -34,7 +34,7 @@ function register_cpt_slide() {
         'labels' => $labels,
         'hierarchical' => false,
         'supports' => array( 'title', 'editor', 'thumbnail' ),
-        'taxonomies' => array( 'category' ),
+        'taxonomies' => array( 'slideshows' ),
         'public' => true,
         'show_ui' => true,
         'show_in_menu' => true,
@@ -87,71 +87,113 @@ function register_taxonomy_slideshows() {
         'rewrite' => array( 'slug' => 'slideshow' )
     );
 
-    register_taxonomy( 'slideshow', 'slide', $args );
+    register_taxonomy( 'slideshows', 'slide', $args );
 }
 
-//Add CSS for Slider
-add_action('wp_print_styles', 'jbfj_slider_styles');
 
-function jbfj_slider_styles() {
-	//register
-	wp_register_style('jbfjslider_styles', plugins_url('lib/css/jbfj-slider.css', __FILE__));
+// Create New SQL DB Table
+function jbfj_slider_create_table() {
+	global $wpdb;
 	
-	//enqueue
-	wp_enqueue_style('jbfjslider_styles');
+	$type = 'slideshows';
+	$table_name = $wpdb->prefix . $type . 'meta';
+		
+	  $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+	  	meta_id bigint(20) NOT NULL AUTO_INCREMENT,
+	  	{$type}_id bigint(20) NOT NULL default 0,
+
+		meta_key varchar(255) DEFAULT NULL,
+		meta_value tinytext DEFAULT NULL,
+	   		
+	  	UNIQUE KEY meta_id (meta_id)
+	);";
+
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	dbDelta($sql);
+}
+
+// this hook will cause our creation function to run when the plugin is activated
+register_activation_hook( __FILE__, 'jbfj_slider_create_table' );
+
+// Initialize Plugin
+add_action('init', 'jbfj_slider_init');
+
+function jbfj_slider_init() {
+	global $wpdb;
+	$variable_name = $type . 'meta';
+	$wpdb->$variable_name = $table_name;
+	$wpdb->slideshowsmeta = $wpdb->prefix . 'slideshowsmeta';
 }
 
 //Add Javascript for Slider
-add_action('wp_print_scripts', 'jbfj_slider_scripts');
+add_action('wp_enqueue_scripts', 'jbfj_slider_scripts' );
 
 function jbfj_slider_scripts() {
-
-	$jbfjslider_options = get_option('jbfj_slider_options');
 	
 	if ( !is_admin() ) {
-		//register
-		//wp_register_script('jquery-easing', plugin_url('lib/js/jquery.easing.1.3.js', __FILE__), array('jquery'));
-		//wp_register_script('fitvids', plugin_url('lib/js/jquery.fitvids.js', __FILE__), array('jquery'));
-		wp_register_script('bxslider_script', plugins_url('lib/js/jquery.bxslider.min.js', __FILE__), array('jquery'));
-		wp_register_script('jbfj-slider_script', plugins_url('lib/js/script.js', __FILE__));
-		
-		//enqueue
-		wp_enqueue_script('bxslider_script');
-		wp_enqueue_script('jbfj-slider_script');
 	
-		wp_localize_script('jbfj-slider_script', 'jbfjslidersettings',
-			array(
-				'jbfjslidermode' => $jbfjslider_options['slider_mode'],
-				'jbfjsliderspeed' => $jbfjslider_options['slider_speed'],
-				'jbfjsliderpause' => $jbfjslider_options['slider_pause'],
-				'jbfjslideruseCSS' => $jbfjslider_options['slider_useCSS'],
-				'jbfjsliderpager' => $jbfjslider_options['slider_pager'],
-				'jbfjslidercontrols' => $jbfjslider_options['slider_controls'],
-				'jbfjsliderhover' => $jbfjslider_options['slider_hover'],
-				'jbfjsliderticker' => $jbfjslider_options['slider_ticker'],
-				'jbfjslidertHover' => $jbfjslider_options['slider_tHover']
-			)
-		);
+		wp_register_style('jbfjslider_styles', plugins_url('lib/css/jbfj-slider.css', __FILE__));
+		
+		wp_register_script('bxslider_script', plugins_url('lib/js/jquery.bxslider.min.js', __FILE__), array('jquery'), false, true );
+		wp_register_script('jbfj-slider_script', plugins_url('lib/js/jbfj-slider-script.js', __FILE__), array('jquery'), false, true );
 
 	}
+	
 }
 
-/******************* SETTINGS SECTION ************************/
-// Add admin menu
-function jbfj_slider_settings_menu() {
-	require JBFJ_PATH . 'lib/jbfj-slider-settings.php';
-	//add submenu
-	add_submenu_page('edit.php?post_type=slide', 'Slider Settings', 'Slider Settings', 'manage_options', 'slider-settings', 'jbfj_slider_settings_page');
-}
-add_action('admin_menu', 'jbfj_slider_settings_menu');
 
-/******************* SLIDE ADMIN SECTION ****************/
+/******************* SLIDE ADMIN & SETTINGS SECTIONS ****************/
 if ( is_admin() ) {
-	require_once( 'lib/jbfj-slider-admin.php' );	
+	require_once( 'lib/jbfj-slider-admin.php' );
+	require_once( 'lib/jbfj-slider-settings.php' );
 }
 
 /******************* FRONT END OUTPUT *******************/
 //Display functionality
-function jbfj_slider( $slideshow='') {
-	include('lib/jbfj-slider-output.php');
+function jbfj_slider( $slideshow = '' ) {
+	include('lib/jbfj-slider-output.php');	
+	global $slideshows;	
+	global $wpdb;
+	
+	$term = get_term_by( 'name', $slideshow, 'slideshows' );
+	$slideshowid = $term->term_id;	
+	$table_name = $wpdb->prefix . 'slideshowsmeta';
+	
+	$slider_mode = $wpdb->get_var( "SELECT meta_value FROM wp_slideshowsmeta WHERE slideshows_id = {$slideshowid} AND meta_key= 'slider_mode'" );
+	$slider_speed = $wpdb->get_var( "SELECT meta_value FROM wp_slideshowsmeta WHERE slideshows_id = {$slideshowid} AND meta_key= 'slider_speed'" );
+	$slider_pause = $wpdb->get_var( "SELECT meta_value FROM wp_slideshowsmeta WHERE slideshows_id = {$slideshowid} AND meta_key= 'slider_pause'" );
+	$slider_useCSS = $wpdb->get_var( "SELECT meta_value FROM wp_slideshowsmeta WHERE slideshows_id = {$slideshowid} AND meta_key= 'slider_useCSS'" );
+	$slider_pager = $wpdb->get_var( "SELECT meta_value FROM wp_slideshowsmeta WHERE slideshows_id = {$slideshowid} AND meta_key= 'slider_pager'" );
+	$slider_controls = $wpdb->get_var( "SELECT meta_value FROM wp_slideshowsmeta WHERE slideshows_id = {$slideshowid} AND meta_key= 'slider_controls'" );
+	$slider_hover = $wpdb->get_var( "SELECT meta_value FROM wp_slideshowsmeta WHERE slideshows_id = {$slideshowid} AND meta_key= 'slider_hover'" );
+	$slider_ticker = $wpdb->get_var( "SELECT meta_value FROM wp_slideshowsmeta WHERE slideshows_id = {$slideshowid} AND meta_key= 'slider_ticker'" );
+	$slider_tHover = $wpdb->get_var( "SELECT meta_value FROM wp_slideshowsmeta WHERE slideshows_id = {$slideshowid} AND meta_key= 'slider_tHover'" );
+	
+	$slideshows[$slideshow] = array(
+		'jbfjslidermode' => $slider_mode,
+		'jbfjsliderspeed' => $slider_speed,
+		'jbfjsliderpause' => $slider_pause,
+		'jbfjslideruseCSS' => $slider_useCSS,
+		'jbfjsliderpager' => $slider_pager,
+		'jbfjslidercontrols' => $slider_controls,
+		'jbfjsliderhover' => $slider_hover,
+		'jbfjsliderticker' => $slider_ticker,
+		'jbfjslidertHover' => $slider_tHover
+	);
+	
+	wp_enqueue_script('bxslider_script');
+	wp_enqueue_script('jbfj-slider_script');
+	wp_enqueue_style('jbfjslider_styles');
+}
+
+//Localize Settings for use in Slider JS
+add_action( 'wp_footer', 'jbfj_slider_localize' );
+
+function jbfj_slider_localize() {
+	global $slideshows;	
+	
+	if ( !is_admin() ) {
+	
+		wp_localize_script('jbfj-slider_script', 'jbfjslidersettings', $slideshows);
+	}
 }

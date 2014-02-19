@@ -1,240 +1,268 @@
 <?php
-function jbfj_slider_settings_page() {
+
+// Add fields to Create Page
+add_action('slideshows_add_form_fields', 'jbfj_add_slider', 10, 2);
+
+function jbfj_add_slider() {
 	
-	// check for sufficient admin permissions
-	if ( !current_user_can('manage_options') ) {
-		wp_die(__('You do not have sufficient permissions to access this page') );
+	$slider_mode = get_metadata('slideshows', $tag->term_id, 'slider_mode', true);
+    
+    
+    $slider_speed = get_metadata('slideshows', $tag->term_id, 'slider_speed', true);
+    if (!$slider_speed) {
+        $slider_speed = '500';
 	}
 	
-	//variables for the fields & options
+    $slider_pause = get_metadata('slideshows', $tag->term_id, 'slider_pause', true);
+	if (!$slider_pause) {
+        $slider_pause = '4000';
+    }
+    
+    $slider_useCSS = get_metadata('slideshows', $tag->term_id, 'slider_useCSS', true);
+	if (!$slider_useCSS) {
+        $slider_useCSS = '0';
+    }
+    
+    $slider_pager = get_metadata('slideshows', $tag->term_id, 'slider_pager', true);
+	if (!$slider_pager) {
+        $slider_pager = '0';
+    }
+    
+    $slider_controls = get_metadata('slideshows', $tag->term_id, 'slider_controls', true);
+	if (!$slider_controls) {
+        $slider_controls = '0';
+    }
+    
+    $slider_hover = get_metadata('slideshows', $tag->term_id, 'slider_hover', true);
+	if (!$slider_hover) {
+        $slider_hover = '0';
+    }
+    
+    $slider_ticker = get_metadata('slideshows', $tag->term_id, 'slider_ticker', true);
+	if (!$slider_ticker) {
+        $slider_ticker = '0';
+    }
+    
+    $slider_tHover = get_metadata('slideshows', $tag->term_id, 'slider_tHover', true);
+	if (!$slider_tHover) {
+        $slider_tHover = '0';
+    } 
 	
 ?>
-
-<div class="wrap">
-	<?php screen_icon('options-general'); ?><h2>jbfj Slider Settings</h2>
-	<?php settings_errors(); ?>
+	<div class="form-field">
+		<label for="slider_mode"><?php _e( 'Effects Mode', 'jbfj' ); ?></label>
+		<select name="slider_mode" id="slider_mode">
+			<option value="fade" <?php selected( $slider_mode, 'fade' ); ?>>Fade</option>
+			<option value="horizontal" <?php selected( $slider_mode, 'horizontal' ); ?>>Horizontal</option>
+			<option value="vertical" <?php selected( $slider_mode, 'vertical' ); ?>>Vertical</option>
+		</select>
+	</div>
 	
-	<form method="post" action="options.php">
-		<?php 
-			settings_fields('jbfj_slider_options');
-			do_settings_sections('jbfj_slider_admin'); 
-		
-			submit_button(); 
-		?>
-	</form>
+	<div class="form-field">
+		<label for="slider_speed"><?php _e( 'Transition Speed', 'jbfj' ); ?></label>
+		<input type="text" id="slider_speed" name="slider_speed" size="20" value="<?php echo $slider_speed ?>" />
+	</div>
 	
-	<p><?php printf( __ ( 'Use %1$s to add this slideshow to your theme.', 'slide'), "<code><&#63;php if ( function_exists( 'jbfj_slider' ) ) { jbfj_slider(); } &#63;></code>")?></p>
-</div>
-
+	<div class="form-field">
+		<label for="slider_pause"><?php _e( 'Display Time', 'jbfj' ); ?></label>
+		<input type="text" id="slider_pause" name="slider_pause" size="20" value="<?php echo $slider_pause; ?>" />
+	</div>
+	
+	<div class="form-field">
+		<label for="slider_useCSS"><?php _e( 'Use CSS Transitions', 'jbfj' ); ?></label>
+		<input type="checkbox" id="slider_useCSS" name="slider_useCSS" value="0" <?php checked( $slider_useCSS, 1 ); ?>/>
+	</div>
+	
+	<div class="form-field">
+		<label for="slider_pager"><?php _e( 'Display Pager', 'jbfj' ); ?></label>
+		<input type="checkbox" id="slider_pager" name="slider_pager" value="0" <?php checked( 1, $slider_pager ); ?>/>
+	</div>
+	
+	<div class="form-field">
+		<label for="slider_controls"><?php _e( 'Display Prev/Next Controls', 'jbfj' ); ?></label>
+		<input type="checkbox" id="slider_controls" name="slider_controls" value="0" <?php checked( 1, $slider_controls ); ?>/>
+	</div>
+	
+	<div class="form-field">
+		<label for="slider_hover"><?php _e( 'Pause on Hover', 'jbfj' ); ?></label>
+		<input type="checkbox" id="slider_hover" name="slider_hover" value="0" <?php checked( 1, $slider_hover ); ?>/>
+	</div>
+	
+	<div class="form-field">
+		<label for="slider_ticker"><?php _e( 'Use as Ticker', 'jbfj' ); ?></label>
+		<input type="checkbox" id="slider_ticker" name="slider_ticker" value="0" <?php checked( 1, $slider_ticker ); ?>/>
+	</div>
+	
+	<div class="form-field">
+		<label for="slider_tHover"><?php _e( 'Pause Ticker on Hover', 'jbfj' ); ?></label>
+		<input type="checkbox" id="slider_tHover" name="slider_tHover" value="0" <?php checked( 1, $slider_tHover ); ?>/>
+	</div>
 <?php }
 
-// Set Defaults
-function jbfj_slider_default_options() {
-	
-	$defaults = array(
-		'slider_mode'	=>	'fade',
-		'slider_speed'	=>	'500',
-		'slider_pause'		=>	'4000',
-		'slider_useCSS'		=>	false,
-		'slider_pager'		=>	false,
-		'slider_controls'	=>	false,
-		'slider_hover'	=>	false,
-		'slider_ticker'		=>	false,
-		'slider_tHover'		=>	false
-	);
-	
-	return apply_filters( 'jbfj_slider_default_options', $defaults );
-	
-}
-add_action('admin_init', 'jbfj_slider_admin_init');
+// Add fields to Edit Page
+add_action( 'slideshows_edit_form_fields', 'jbfj_edit_slider_settings', 10, 2);
 
-function jbfj_slider_admin_init() {
+function jbfj_edit_slider_settings($tag, $taxonomy) {
 
-	if( false == get_option( 'jbfj_slider_options' ) ) {	
-		add_option( 'jbfj_slider_options', apply_filters( 'jbfj_slider_default_options', jbfj_slider_default_options() ) );
+    $slider_mode = get_metadata('slideshows', $tag->term_id, 'slider_mode', true);
+    
+    
+    $slider_speed = get_metadata('slideshows', $tag->term_id, 'slider_speed', true);
+    if (!$slider_speed) {
+        $slider_speed = '500';
 	}
-	// Main Slider settings
-	add_settings_section('jbfj_slider_main', 'Slider Settings', 'main_section_callback', 'jbfj_slider_admin');
-	add_settings_field(
-		'slider_mode',
-		'Effect Mode:',
-		'slider_mode_callback',
-		'jbfj_slider_admin',
-		'jbfj_slider_main'
-	);
-	add_settings_field(
-		'slider_speed',
-		'Transisiton Speed:',
-		'slider_speed_callback',
-		'jbfj_slider_admin',
-		'jbfj_slider_main'
-	);
-	add_settings_field(
-		'slider_pause',
-		'Display Time:',
-		'slider_pause_callback',
-		'jbfj_slider_admin',
-		'jbfj_slider_main'
-	);
-	add_settings_field(
-		'slider_useCSS',
-		'Use CSS3 Transitions:',
-		'slider_useCSS_callback',
-		'jbfj_slider_admin',
-		'jbfj_slider_main'
-	);
-	add_settings_field(
-		'slider_pager',
-		'Display Pager:',
-		'slider_pager_callback',
-		'jbfj_slider_admin',
-		'jbfj_slider_main'
-	);
-	add_settings_field(
-		'slider_controls',
-		'Display Prev/Next Controls:',
-		'slider_controls_callback',
-		'jbfj_slider_admin',
-		'jbfj_slider_main'
-	);
-	add_settings_field(
-		'slider_hover',
-		'Pause on Hover:',
-		'slider_hover_callback',
-		'jbfj_slider_admin',
-		'jbfj_slider_main'
-	);
 	
-	// Ticker Settings
-	add_settings_section('jbfj_slider_ticker', 'Ticker', 'ticker_section_callback', 'jbfj_slider_admin');
-	add_settings_field(
-		'slider_ticker',
-		'Ticker Mode:',
-		'slider_ticker_callback',
-		'jbfj_slider_admin',
-		'jbfj_slider_ticker'
-	);
-	add_settings_field(
-		'slider_tHover',
-		'Pause Ticker on Hover:',
-		'slider_tHover_callback',
-		'jbfj_slider_admin',
-		'jbfj_slider_ticker'
-	);
+    $slider_pause = get_metadata('slideshows', $tag->term_id, 'slider_pause', true);
+	if (!$slider_pause) {
+        $slider_pause = '4000';
+    }
+    
+    $slider_useCSS = get_metadata('slideshows', $tag->term_id, 'slider_useCSS', true);
+	if (!$slider_useCSS) {
+        $slider_useCSS = 'false';
+    }
+    
+    $slider_pager = get_metadata('slideshows', $tag->term_id, 'slider_pager', true);
+	if (!$slider_pager) {
+        $slider_pager = '0';
+    }
+    
+    $slider_controls = get_metadata('slideshows', $tag->term_id, 'slider_controls', true);
+	if (!$slider_controls) {
+        $slider_controls = '0';
+    }
+    
+    $slider_hover = get_metadata('slideshows', $tag->term_id, 'slider_hover', true);
+	if (!$slider_hover) {
+        $slider_hover = '0';
+    }
+    
+    $slider_ticker = get_metadata('slideshows', $tag->term_id, 'slider_ticker', true);
+	if (!$slider_ticker) {
+        $slider_ticker = '0';
+    }
+    
+    $slider_tHover = get_metadata('slideshows', $tag->term_id, 'slider_tHover', true);
+	if (!$slider_tHover) {
+        $slider_tHover = '0';
+    } 
+
+?>	
+	<tr class="form-field">
+		<th scope="row" valign="top"><label for="slider_mode"><?php _e( 'Effects Mode', 'jbfj' ); ?></label></th>
+		<td>
+			<select name="slider_mode" id="slider_mode">
+				<option value="fade" <?php selected( $slider_mode, 'fade' ); ?>>Fade</option>
+				<option value="horizontal" <?php selected( $slider_mode, 'horizontal' ); ?>>Horizontal</option>
+				<option value="vertical" <?php selected( $slider_mode, 'vertical' ); ?>>Vertical</option>
+			</select>
+		</td>
+	</tr>
+    <tr class="form-field">
+		<th scope="row" valign="top"><label for="slider_speed"><?php _e( 'Transition Speed', 'jbfj' ); ?></label></th>
+		<td>
+			<input type="text" id="slider_speed" name="slider_speed" size="20" value="<?php echo $slider_speed ?>" />
+		</td>
+	</tr>
+	<tr class="form-field">
+		<th scope="row" valign="top"><label for="slider_pause"><?php _e( 'Display Time', 'jbfj' ); ?></label></th>
+		<td>
+			<input type="text" id="slider_pause" name="slider_pause" size="20" value="<?php echo $slider_pause; ?>" />
+		</td>
+	</tr>
+	<tr class="form-field">
+		<th scope="row" valign="top"><label for="slider_useCSS"><?php _e( 'Use CSS Transitions', 'jbfj' ); ?></label></th>
+		<td>
+			<input type="checkbox" id="slider_useCSS" name="slider_useCSS" value="0" <?php checked( $slider_useCSS, 1 ); ?>/>
+		</td>
+	</tr>
+	<tr class="form-field">
+		<th scope="row" valign="top"><label for="slider_pager"><?php _e( 'Display Pager', 'jbfj' ); ?></label></th>
+		<td>
+			<input type="checkbox" id="slider_pager" name="slider_pager" value="0" <?php checked( 1, $slider_pager ); ?>/>
+		</td>
+	</tr>
+	<tr class="form-field">
+		<th scope="row" valign="top"><label for="slider_controls"><?php _e( 'Display Prev/Next Controls', 'jbfj' ); ?></label></th>
+		<td>
+			<input type="checkbox" id="slider_controls" name="slider_controls" value="0" <?php checked( 1, $slider_controls ); ?>/>
+		</td>
+	</tr>
+	<tr class="form-field">
+		<th scope="row" valign="top"><label for="slider_hover"><?php _e( 'Pause on Hover', 'jbfj' ); ?></label></th>
+		<td>
+			<input type="checkbox" id="slider_hover" name="slider_hover" value="0" <?php checked( 1, $slider_hover ); ?>/>
+		</td>
+	</tr>
+	<tr class="form-field">
+		<th scope="row" valign="top"><label for="slider_ticker"><?php _e( 'Use as Ticker', 'jbfj' ); ?></label></th>
+		<td>
+			<input type="checkbox" id="slider_ticker" name="slider_ticker" value="0" <?php checked( 1, $slider_ticker ); ?>/>
+		</td>
+	</tr>
+	<tr class="form-field">
+		<th scope="row" valign="top"><label for="slider_tHover"><?php _e( 'Pause Ticker on Hover', 'jbfj' ); ?></label></th>
+		<td>
+			<input type="checkbox" id="slider_tHover" name="slider_tHover" value="0" <?php checked( 1, $slider_tHover ); ?>/>
+		</td>
+	</tr>
 	
-	register_setting('jbfj_slider_options', 'jbfj_slider_options', 'jbfj_slider_validate');
-}
+<?php }
 
-// Section description callbacks
-function main_section_callback() {
-	echo '<p>All slider settings here</p>';
-}
-function ticker_section_callback() {
-	echo '<p>Settings for using slider as news ticker</p>';
-}
+// Save Fields
+add_action( 'edited_slideshows', 'jbfj_save_slider_settings', 10, 2);
+add_action( 'create_slideshows', 'jbfj_save_slider_settings', 10, 2 );
 
-/************** Individual field callbacks *****************/
-// Effect Mode
-function slider_mode_callback() {
-	$options = get_option('jbfj_slider_options');
-	$html = '<select id="slider_mode" name="jbfj_slider_options[slider_mode]">';
-		$html .= '<option value="fade">' . __( 'Fade' ) . '</option>';
-		$html .= '<option value="horizontal"' . selected( $options['slider_mode'], 'horizontal', false) . '>' . __( 'Horizontal') . '</option>';
-		$html .= '<option value="vertical"' . selected( $options['slider_mode'], 'vertical', false) . '>' . __( 'Vertical') . '</option>';
+function jbfj_save_slider_settings( $term_id, $tt_id ) {
+
+    if (!$term_id) return;
+    
+    if (isset($_POST['slider_mode'])) {
+        update_metadata('slideshows', $term_id, 'slider_mode', $_POST['slider_mode']);
+    }
+    
+    if (isset($_POST['slider_speed'])) {
+    	update_metadata('slideshows', $term_id, 'slider_speed', $_POST['slider_speed']);  
+    }
+
+    if (isset($_POST['slider_pause'])) {
+	    update_metadata('slideshows', $term_id, 'slider_pause', $_POST['slider_pause']);
+    }
+    
+    if (isset($_POST['slider_useCSS'])) {
+        update_metadata('slideshows', $term_id, 'slider_useCSS', true);
+    } else {
+	    update_metadata('slideshows', $term_id, 'slider_useCSS', false);
+    }
+
+	if (isset($_POST['slider_pager'])) {
+		update_metadata('slideshows', $term_id, 'slider_pager', true);
+	} else {
+	    update_metadata('slideshows', $term_id, 'slider_pager', false);
+    }
+        
+	if (isset($_POST['slider_controls'])) {
+		update_metadata('slideshows', $term_id, 'slider_controls', true);
+	} else {
+	    update_metadata('slideshows', $term_id, 'slider_controls', false);
+    }
+
+	if (isset($_POST['slider_hover'])) {
+		update_metadata('slideshows', $term_id, 'slider_hover', true);
+	} else {
+	    update_metadata('slideshows', $term_id, 'slider_hover', false);
+    }
+
+	if (isset($_POST['slider_ticker'])) {
+		update_metadata('slideshows', $term_id, 'slider_ticker', true);
+	} else {
+	    update_metadata('slideshows', $term_id, 'slider_ticker', false);
+    }
 	
-	echo $html;
-}
-
-// Transition Speed
-function slider_speed_callback() {
-	$options = get_option('jbfj_slider_options');
-	echo '<input type="text" id="slider_speed" name="jbfj_slider_options[slider_speed]" size="20" value="' . $options['slider_speed'] . '" />';
-}
-
-// Display Time
-function slider_pause_callback() {
-	$options = get_option('jbfj_slider_options');
-	echo '<input type="text" id="slider_pause" name="jbfj_slider_options[slider_pause]" size="20" value="' . $options['slider_pause'] . '" />';
-}
-
-// Use CSS3 Transitions
-function slider_useCSS_callback() {
-	$options = get_option('jbfj_slider_options');
-	$html = '<input type="checkbox" id="slider_useCSS" name="jbfj_slider_options[slider_useCSS]" value="1"' . checked( 1, $options['slider_useCSS'], false ) . '/>';	
-	echo $html;
-}
-
-// Display pager
-function slider_pager_callback() {
-	$options = get_option('jbfj_slider_options');
-	$html = '<input type="checkbox" id="slider_pager" name="jbfj_slider_options[slider_pager]" value="1"' . checked( 1, $options['slider_pager'], false ) . '/>';
-	echo $html;
-}
-
-// Display prev/next controls
-function slider_controls_callback() {
-	$options = get_option('jbfj_slider_options');
-	$html = '<input type="checkbox" id="slider_controls" name="jbfj_slider_options[slider_controls]" value="1"' . checked( 1, $options['slider_controls'], false ) . '/>';
-	echo $html;
-}
-
-// Pause on Hover
-function slider_hover_callback() {
-	$options = get_option('jbfj_slider_options');
-	$html = '<input type="checkbox" id="slider_hover" name="jbfj_slider_options[slider_hover]" value="1"' . checked( 1, $options['slider_hover'], false ) . '/>';
-	echo $html;
-}
-
-// Slider as ticker
-function slider_ticker_callback() {
-	$options = get_option('jbfj_slider_options');
-	$html = '<input type="checkbox" id="slider_ticker" name="jbfj_slider_options[slider_ticker]" value="1"' . checked( 1, $options['slider_ticker'], false ) . '/>';
-	echo $html;
-}
-
-// Pause ticker on hover
-function slider_tHover_callback() {
-	$options = get_option('jbfj_slider_options');
-	$html = '<input type="checkbox" id="slider_tHover" name="jbfj_slider_options[slider_tHover]" value="1"' . checked( 1, $options['slider_tHover'], false ) . '/>';
-	echo $html;
-}
-
-function jbfj_slider_validate( $input ) {
-	// Create our array for storing the validated options
-	$output = array();
-	
-	// Loop through each of the incoming options
-	foreach( $input as $key => $value ) {
-		
-		// Check to see if the current option has a value. If so, process it.
-		if( isset( $input[$key] ) ) {
-		
-			// Strip all HTML and PHP tags and properly handle quoted strings
-			$output[$key] = strip_tags( stripslashes( $input[ $key ] ) );
-		}		
-	}
-	$defaults = array(
-		'slider_mode'	=>	'fade',
-		'slider_speed'	=>	'500',
-		'slider_pause'		=>	'4000',
-		'slider_useCSS'		=>	false,
-		'slider_pager'		=>	false,
-		'slider_controls'	=>	false,
-		'slider_hover'	=>	false,
-		'slider_ticker'		=>	false,
-		'slider_tHover'		=>	false
-	);
-	
-	foreach( $defaults as $key => $value ) {
-		
-		// Check to see if the current option has a value. If so, process it.
-		if( !isset( $input[$key] ) ) {
-
-			// Strip all HTML and PHP tags and properly handle quoted strings
-			$output[$key] = $value;
-		}		
-	}
-
-	// Return the array processing any additional functions filtered by this action
-	return apply_filters( 'jbfj_slider_validate', $output, $input );
+	if (isset($_POST['slider_tHover'])) {
+		update_metadata('slideshows', $term_id, 'slider_tHover', true);
+	} else {
+	    update_metadata('slideshows', $term_id, 'slider_tHover', false);
+    }
+        
 }

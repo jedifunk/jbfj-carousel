@@ -1,6 +1,5 @@
 /**
  * JBFJ Slider CSS
- * Based on the BX Slider CSS
  */
 
 /** RESET AND LAYOUT
@@ -8,8 +7,9 @@
 
 .bx-wrapper {
 	position: relative;
-	margin: 0 auto 60px;
+	margin: 0 auto;
 	padding: 0;
+	z-index: 0;
 	*zoom: 1;
 }
 
@@ -28,9 +28,8 @@
 .bx-wrapper .bx-pager,
 .bx-wrapper .bx-controls-auto {
 	position: absolute;
-	top: 0;
-	right: 10px;
-	z-index: 60;
+	bottom: -30px;
+	width: 100%;
 }
 
 /* LOADER */
@@ -115,9 +114,6 @@
 
 .bx-wrapper .bx-controls-direction a.disabled {
 	display: none;
-}
-.carousel {
-	margin: 0;
 }
 
 /* IMAGE CAPTIONS */
