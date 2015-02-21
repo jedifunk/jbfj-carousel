@@ -1,4 +1,4 @@
-<div class="carousel" id="<?php echo $slideshow; ?>">
+<div class="jbfj-carousel" id="<?php echo $slideshow; ?>">
 <?php 
 	$args = array( 
 		'post_type' => 'slide', 
@@ -14,11 +14,24 @@
 	$loop = new WP_Query( $args );
 	while ( $loop->have_posts() ) : $loop->the_post();
 		echo '<div class="item">';
-			the_post_thumbnail( 'full' );
-			echo '<div class="carousel-caption">';
-				echo the_content();
-			echo '</div>';
+			$post_id = get_the_ID();
+			$post_meta = get_post_meta( $post_id );
+			if ($post_meta["slide_url"][0]) {
+				echo '<a href="'. $post_meta["slide_url"][0] .'">';
+					the_post_thumbnail( 'full' );
+				echo '</a>';
+			} else {
+				the_post_thumbnail( 'full' );
+			}
+			
+			$caption_content = get_the_content();
+			$caption_content = apply_filters( 'the_content', $caption_content );
+			
+			if( !empty($caption_content) ) {
+				echo '<div class="jbfj-carousel-caption">'.$caption_content.'</div>';
+			}
+			
 		echo '</div>';
-	endwhile;
+	endwhile; wp_reset_postdata();
 ?>
 </div>
